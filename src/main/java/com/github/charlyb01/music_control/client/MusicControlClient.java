@@ -33,6 +33,12 @@ public class MusicControlClient implements ClientModInitializer {
     public static boolean nextCategory = false;
     public static boolean printMusic = false;
 
+    // Jukebox tracking for fade functionality
+    public static boolean isJukeboxPlaying = false;
+    public static boolean shouldResumeAfterJukebox = false;
+    public static Identifier musicBeforeJukebox;
+    public static long musicPositionBeforeJukebox = 0; // Store exact time position
+
     @Override
     public void onInitializeClient() {
         SoundEventRegistry.init();

@@ -184,6 +184,24 @@ public abstract class MusicTrackerMixin {
         float delta = 1.f / (ModConfig.get().general.timer.fadeDuration * 20);
         Identifier nextEvent = instance.music().sound().value().id();
 
+        // Detect if jukebox is currently playing
+        boolean isJukeboxCurrentlyPlaying = MusicControlClient.isJukeboxPlaying;
+
+        // Handle jukebox fade out - use faster fade for immediate response
+        if (MusicControlClient.isJukeboxPlaying || isJukeboxCurrentlyPlaying) {
+            // Use faster fade for jukebox (double the speed)
+            float fastDelta = delta * 2.0f; // 2x faster fade
+            if (this.volume > 0.f) {
+                this.volume = Math.max(0.f, this.volume - fastDelta);
+                this.client.getSoundManager().setVolume(this.current, this.volume);
+            } else {
+                this.client.getSoundManager().stop(this.current);
+                MusicControlClient.isPaused = true; // Pause music during jukebox
+                MusicControlClient.inCustomTracking = false;
+            }
+            return;
+        }
+
         if (MusicIdentifier.shouldNotChangeMusic(nextEvent)) {
             if (this.volume < 1.f) {
                 this.volume = Math.min(1.f, this.volume + delta);
